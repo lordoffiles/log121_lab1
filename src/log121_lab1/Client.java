@@ -20,6 +20,11 @@ public class Client {
 		
 		connect();
 		
+		if(server != null) {
+			server.startGetLoop();
+			
+		}
+		
 		
 		
 	}
@@ -45,14 +50,13 @@ public class Client {
 		}	
 		
 		if(ip != null){
-			server = new ShapeServer();
-			try{
-				server.open(ip, port);
 			
-			} catch(IOException e) {
-				return false;
-			}
+			server = new ShapeServer();
+			if(server.open(ip, port))
+				window.alert("Succes", server.status());
+			
 		} else {
+			System.out.println("null ip");
 			connect();
 		}
 		return true;

@@ -16,8 +16,13 @@ public class WindowManager extends JFrame {
 		
 	}
 	
+	public void alert(String title, String message) {
+		JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
+		
+	}
+	
 	public String prompt() {
-		String in = JOptionPane.showInputDialog(this, "Entrez les informations de connection.", "10.0.0.1:9999");
+		String in = JOptionPane.showInputDialog(this, "Entrez les informations de connection.", "127.0.0.1:10000");
 		
 		return in;
 	}
@@ -27,7 +32,7 @@ public class WindowManager extends JFrame {
 				error
 				+ "\n"
 				+ "Entrez les informations de connection.", 
-				"10.0.0.1:9999");
+				"127.0.0.1:10000");
 		
 		return in;
 		
