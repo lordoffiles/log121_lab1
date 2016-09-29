@@ -1,9 +1,15 @@
 package log121_lab1;
 
+import java.awt.Component;
+
 import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 
+
 public class WindowManager extends JFrame {
+	Component[] displayQueue = new Component[10];
+	
 	
 	public WindowManager() {
 		setSize(500, 500);
@@ -11,9 +17,18 @@ public class WindowManager extends JFrame {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		
+		/*
+		 * TODO Do menu bar
+		 */
 		
 		
 		
+		
+		
+	}
+	
+	public void addToDisplayQueue(Component comp) {
+	
 	}
 	
 	public void alert(String title, String message) {
@@ -37,5 +52,6 @@ public class WindowManager extends JFrame {
 		return in;
 		
 	}
+
 	
 }

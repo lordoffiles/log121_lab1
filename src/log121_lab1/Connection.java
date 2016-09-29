@@ -10,7 +10,7 @@ public interface Connection {
 	
 	public String status();
 	
-	public boolean get();
+	public String getResponse();
 	
 	public boolean close();
 	

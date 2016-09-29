@@ -8,6 +8,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.beans.PropertyChangeListener;
 
@@ -22,17 +23,25 @@ public class ShapeServer implements Connection {
 	private PrintWriter out;
 	private SwingWorker worker;
 	private PropertyChangeListener listener;
+	private Reader cipher;
 	
+
+	
+
 	public ShapeServer() {
-		
+		cipher = new Cipher();
 	}
 	
 	public boolean open(InetAddress address, int port)  {
 		
 		try {
 			socket = new Socket(address, port);
+			in = new DataInputStream(socket.getInputStream());
+			out = new PrintWriter(socket.getOutputStream(), true);
+			
 			
 		} catch(IOException e) {
+			
 			return false;
 		}
 		
@@ -63,53 +72,73 @@ public class ShapeServer implements Connection {
 	 * TODO Return the shape from the server // strip the string before and after
 	 */
 	
-	public boolean get() {
-		System.out.println("get");
+	public String getResponse() {
+		//System.out.println("get");
 		
 		try {
-			in = new DataInputStream(socket.getInputStream());
-			out = new PrintWriter(socket.getOutputStream(), true);
+			
 			
 			out.println("GET");;
 			
 			
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			
-			while(reader.ready())
-				System.out.println(reader.readLine());
+			String line = "";
+			while(reader.ready()){
+				line += reader.readLine();
+			}
 			
-			
+			return line;
 			
 		} catch(IOException e) {
 			throw new RuntimeException();
-		} finally {
-			try {
-				in.close();
-				out.close();
-			} catch (IOException e) {
-				throw new RuntimeException();
-			}
+		} 
+	
 		
-		}
-
-		return false;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public void startGetLoop() {
 		worker = new SwingWorker() {
 			
 			@Override
 			protected Object doInBackground() throws Exception {
-			
-				while(true) {
+				String serverShape;
+				String properties;
+				
+				while(!isCancelled()) {
 					Thread.sleep(DELAY);
 					
-					if(listener != null)
-						firePropertyChange("Shape", null, get());
+					
+					serverShape = getResponse();
+					
+					ArrayList<String> splitShape = cipher.split(serverShape, "<?/?[A-Za-z]+>");
+					
+					
+					splitShape.add(0, cipher.findTag(serverShape));
+					properties = splitShape.remove(2);
+					
+					ArrayList<String> splitProperties = cipher.split(properties, " ");
+					
+					splitShape.addAll(2, splitProperties);
+					
+					System.out.println("lel");
+					if(listener != null){
+						
+						
+						firePropertyChange("Shape", null, splitShape);
+					}
+							
 				}
+				return null;
+
 			
 			}
-		
+			
+			
+			
+
+			
 		};
 		
 		if(listener != null)
@@ -125,6 +154,8 @@ public class ShapeServer implements Connection {
 	
 	public boolean close() {
 		try{
+			in.close();
+			out.close();
 			socket.close();
 		} catch(IOException e){
 			return false;
@@ -133,5 +164,8 @@ public class ShapeServer implements Connection {
 		return true;
 	}
 
+	public void setCipher(Reader cipher) {
+		this.cipher = cipher;
+	}
 
 }
