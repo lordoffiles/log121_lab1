@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.beans.PropertyChangeListener;
 
+import javax.management.RuntimeErrorException;
 import javax.swing.SwingWorker;
 
 public class ShapeServer implements Connection {
@@ -36,8 +37,7 @@ public class ShapeServer implements Connection {
 		
 		try {
 			socket = new Socket(address, port);
-			in = new DataInputStream(socket.getInputStream());
-			out = new PrintWriter(socket.getOutputStream(), true);
+			
 			
 			
 		} catch(IOException e) {
@@ -69,11 +69,17 @@ public class ShapeServer implements Connection {
 	 * (non-Javadoc)
 	 * @see log121_lab1.Connection#get()
 	 * 
-	 * TODO Return the shape from the server // strip the string before and after
+	 * 
 	 */
 	
 	public String getResponse() {
-		//System.out.println("get");
+		
+		try {
+			in = new DataInputStream(socket.getInputStream());
+			out = new PrintWriter(socket.getOutputStream(), true);
+		} catch (IOException e) {
+			throw new RuntimeException();
+		}
 		
 		try {
 			
@@ -88,11 +94,23 @@ public class ShapeServer implements Connection {
 				line += reader.readLine();
 			}
 			
+			try {
+				in.close();
+				out.close();
+			} catch (IOException e) {
+				throw new RuntimeException();
+			}
+			
 			return line;
 			
 		} catch(IOException e) {
-			throw new RuntimeException();
+			return "no response from server";
+			
 		} 
+		
+		
+		
+		
 	
 		
 	}
@@ -106,7 +124,7 @@ public class ShapeServer implements Connection {
 				String serverShape;
 				String properties;
 				
-				while(!isCancelled()) {
+				while(true) {
 					Thread.sleep(DELAY);
 					
 					
@@ -126,18 +144,14 @@ public class ShapeServer implements Connection {
 					if(listener != null){
 						
 						
-						firePropertyChange("Shape", null, splitShape);
+						firePropertyChange("Shape", 1, splitShape);
 					}
 							
 				}
-				return null;
+				
 
 			
 			}
-			
-			
-			
-
 			
 		};
 		
@@ -154,11 +168,11 @@ public class ShapeServer implements Connection {
 	
 	public boolean close() {
 		try{
-			in.close();
-			out.close();
 			socket.close();
+			
 		} catch(IOException e){
 			return false;
+			
 		}
 		
 		return true;
@@ -166,6 +180,19 @@ public class ShapeServer implements Connection {
 
 	public void setCipher(Reader cipher) {
 		this.cipher = cipher;
+		
+	}
+	
+	public boolean isSocketOpen() {
+		if(socket != null){
+			return true;
+					
+		}	else{
+			return false;
+					
+		}
+				
+					
 	}
 
 }

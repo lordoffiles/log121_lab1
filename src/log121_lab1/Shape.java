@@ -1,14 +1,22 @@
 package log121_lab1;
 
+import java.awt.Color;
 import java.awt.Component;
 
-public abstract class Shape extends Component{
+public class Shape extends Component{
+	
+	private static int CYAN = 0x00FFFF;
+	private static int MAGENTA = 0xFF00FF;
+	private static int RED = 0xFF0000;
+	private static int YELLOW = 0xFFFF00;
+	private static int BROWN = 0x9C2700;
 	int originX;
 	int originY;
 	int x2;
 	int y2;
 	int radiusX;
 	int radiusY;
+	Color color;
 	
 
 	public class Square extends Shape{
@@ -18,6 +26,7 @@ public abstract class Shape extends Component{
 			this.originY = originY;
 			this.x2 = x2;
 			this.y2 = y2;
+			this.color = new Color(CYAN);
 		}
 	}
 
@@ -28,6 +37,7 @@ public abstract class Shape extends Component{
 			this.originY = originY;
 			this.x2 = x2;
 			this.y2 = y2;
+			this.color = new Color(MAGENTA);
 		}
 	}
 
@@ -37,6 +47,7 @@ public abstract class Shape extends Component{
 			this.originX = originX; 
 			this.originY = originY;
 			this.radiusX = radiusX;
+			this.color = new Color(RED);
 		}
 		
 	}
@@ -48,6 +59,7 @@ public abstract class Shape extends Component{
 			this.originY = originY;
 			this.radiusX = radiusX;
 			this.radiusY = radiusY;
+			this.color = new Color(YELLOW);
 		}
 	}
 
@@ -58,6 +70,7 @@ public abstract class Shape extends Component{
 			this.originY = originY;
 			this.x2 = x2;
 			this.y2 = y2;
+			this.color = new Color(BROWN);
 		}
 	}
 
