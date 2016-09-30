@@ -16,6 +16,12 @@ import javax.swing.JMenuItem;
 
 import ca.etsmtl.log.util.*;
 
+/**
+ * Main class
+ * @author Vincent Roy
+ * @date 29/09/2015
+ *
+ */
 public class Client implements PropertyChangeListener, ActionListener{
 	
 	WindowManager window;
@@ -81,14 +87,14 @@ public class Client implements PropertyChangeListener, ActionListener{
 		
 		connect("");
 		
-		
+		server.setCipher(cipher);
 		
 		server.setProprietyChangeListener(this);
 		
-//		if(server != null) {
-//			server.startGetLoop();
-//			
-//		}
+		if(server != null) {
+			server.startGetLoop();
+			
+		}
 	
 		//propertyChange(new PropertyChangeEvent(this, "shape", 1, new ArrayList<String>({"CARRE","100","100","300","300"}) );
 		
@@ -99,6 +105,8 @@ public class Client implements PropertyChangeListener, ActionListener{
 	/**
 	 * Initiates the connection with the server. Prompts the user for the 
 	 * server info.
+	 * 
+	 * Strips the message to get the ip and the port separately. 
 	 * 
 	 * If it cannot connect, it will ask again for the info
 	 * 
@@ -154,7 +162,6 @@ public class Client implements PropertyChangeListener, ActionListener{
 	}
 	
 	
-	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -167,20 +174,23 @@ public class Client implements PropertyChangeListener, ActionListener{
 		
 	}
 	
-
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		System.out.println(evt.getNewValue());
-		//ArrayList<String> sl = (ArrayList<String>)evt.getNewValue();
+		
+		if((evt.getOldValue()).equals(1) )	{
+			/*
+			 * I know it will be an arraylist... it can't be otherwise
+			 */
+			ArrayList<String> sl = (ArrayList<String>) evt.getNewValue();
+			if(sl.size()>1){
+				System.out.println(sl);
+				logger.logID(Integer.parseInt(sl.get(1)));
+//			
+//				window.addToDisplayQueue(shaper.create(sl));
+			}
+		}
 		
 		
-//		if(evt.getOldValue().equals(1))	{
-//			logger.logID(sl.get(1));
-			//window.addToDisplayQueue(shaper.create(sl);
-			
-		//}
-		//System.out.println(evt);
-		//String serverShape = (String) evt.getNewValue();
 		
 		
 		
@@ -197,6 +207,11 @@ public class Client implements PropertyChangeListener, ActionListener{
 				window.alert("Server Status", server.status());
 				break;
 			case "openConnection":
+				/*
+				 * checks if the server is already open before opening 
+				 * a new socket
+				 */
+				
 				if(!server.isSocketOpen()) {
 					connect("");
 				} else {

@@ -2,6 +2,12 @@ package log121_lab1;
 
 import java.util.ArrayList;
 
+/**
+ * Creates shape objects
+ * @author Vincent
+ * @date 29/09/2015
+ *
+ */
 public class Shaper {
 	
 	Shape shape;
@@ -9,7 +15,14 @@ public class Shaper {
 		shape = new Shape();
 	}
 	
+	/**
+	 * Creates a Shape corresponding to the name in the first index of the 
+	 * list
+	 * @param shapeStrings list of properties from the shape
+	 * @return the shape object
+	 */
 	public Shape create(ArrayList<String> shapeStrings) {
+		System.out.println(shapeStrings);
 		ArrayList<String> sl = shapeStrings;
 		int[] prop = new int[sl.size()];
 		

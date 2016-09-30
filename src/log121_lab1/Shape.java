@@ -3,6 +3,12 @@ package log121_lab1;
 import java.awt.Color;
 import java.awt.Component;
 
+/**
+ * Shapes - Square, Rectangle, Circle, Oval, Line
+ * @author Vincent Roy
+ * @date 29/09/2015
+ *
+ */
 public class Shape extends Component{
 	
 	private static int CYAN = 0x00FFFF;

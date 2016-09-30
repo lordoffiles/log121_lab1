@@ -1,6 +1,12 @@
 package log121_lab1;
 import java.util.ArrayList;
 
+/**
+ * 
+ * @author Vincent Roy
+ * @date 29/09/2015
+ *
+ */
 public interface Reader {
 	
 	/**

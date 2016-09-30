@@ -2,6 +2,12 @@ package log121_lab1;
 
 import java.util.ArrayList;
 
+/**
+ * Reads the strings and processes them
+ * @author Vincent Roy
+ * @date 29/09/2015
+ *
+ */
 public class Cipher implements Reader {
 
 	public ArrayList<String> split(String input, String splitPoint){
@@ -67,33 +73,35 @@ public class Cipher implements Reader {
 		int i = 0;
 		do{
 			if(i == 0) {
-				for(String line : input.split(splitPoints[i])) {
-					System.out.println(line);
-					stringList.add(line);
+				for(String line : split(input, splitPoints[i])) {
+					if(!line.equals(" "))	
+						stringList.add(line);
 					
 				}
 				
 			} else {
-				System.out.println("else");
+				
 				for(String element : stringList) {
-					System.out.println(element);
-					for(String line : element.split(splitPoints[i])){
-						System.out.println(line);
-						working.add(line);
+					
+					for(String line : split(element, splitPoints[i])){
+						if(!line.equals(" "))
+							working.add(line);
 						
 					}
 					
 				}
 				
+				stringList = working;
+				
 			}
 			
-			stringList = working;
+			
 			i++;
 			
 		} while(i<splitPoints.length);
 		
-		System.out.println(stringList.size());
+		//System.out.println(stringList.size());
 		
-		return working;
+		return stringList;
 	}
 }

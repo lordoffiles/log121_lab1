@@ -8,7 +8,12 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
-
+/**
+ * Frame containing the shapes
+ * @author Vincent
+ * @date 29/09/2015
+ *
+ */
 public class WindowManager extends JFrame {
 	DisplayQueue queue;
 	
@@ -32,7 +37,13 @@ public class WindowManager extends JFrame {
 		
 	}
 	
+	/**
+	 * Adds the specified component to the display queue which acts in a first
+	 * in first out fashion
+	 * @param comp the component to add
+	 */
 	public void addToDisplayQueue(Component comp) {
+		System.out.println(comp);
 		DisplayQueue oldQueue = queue;
 		queue.addToQueue(comp);
 		
@@ -40,6 +51,11 @@ public class WindowManager extends JFrame {
 		
 	}
 	
+	/**
+	 * Verifies which component is the newest in the queue and adds it to 
+	 * the frame
+	 * @param oldQueue the queue before adding the element
+	 */
 	private void validateDisplay(DisplayQueue oldQueue) {
 		int i = 0;
 		while(i < queue.size()) {
@@ -53,17 +69,32 @@ public class WindowManager extends JFrame {
 		
 	}
 	
+	/**
+	 * Displays a popup window
+	 * @param title of the popup
+	 * @param message inside the popup
+	 */
 	public void alert(String title, String message) {
 		JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
 		
 	}
 	
+	/**
+	 * prompts the user for connection info
+	 * @return the string with the input from the user
+	 */
 	public String prompt() {
 		String in = JOptionPane.showInputDialog(this, "Entrez les informations de connection.", "127.0.0.1:10000");
 		
 		return in;
 	}
 	
+	/**
+	 * prompts the user for connection info and adds an error message before the 
+	 * text.
+	 * @param error to display before the message
+	 * @return the string with the input from the user
+	 */
 	public String prompt(String error) {
 		String in = JOptionPane.showInputDialog(this,
 				error
