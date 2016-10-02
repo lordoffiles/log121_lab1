@@ -13,7 +13,7 @@ public interface Connection {
 	
 	public String status();
 	
-	public String getResponse();
+	public String getResponse() throws IOException;
 	
 	public boolean close();
 	

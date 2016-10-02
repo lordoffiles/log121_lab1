@@ -4,13 +4,13 @@ import java.util.ArrayList;
 
 /**
  * Creates shape objects
- * @author Vincent
+ * @author Vincent Roy
  * @date 29/09/2015
  *
  */
 public class Shaper {
-	
 	Shape shape;
+	
 	public Shaper() {
 		shape = new Shape();
 	}
@@ -18,21 +18,28 @@ public class Shaper {
 	/**
 	 * Creates a Shape corresponding to the name in the first index of the 
 	 * list
-	 * @param shapeStrings list of properties from the shape
+	 * @param properties list of properties for the shape
 	 * @return the shape object
 	 */
-	public Shape create(ArrayList<String> shapeStrings) {
-		System.out.println(shapeStrings);
-		ArrayList<String> sl = shapeStrings;
-		int[] prop = new int[sl.size()];
+	public Shape create(String[] properties) {
 		
-		int i = 2;
-		while(i < prop.length) {
-			prop[i] = Integer.parseInt(sl.get(i));
-			
+		String name = "";
+		if(!properties[0].equals(null)){
+			name = properties[0];
 		}
 		
-		switch(shapeStrings.get(0)) {
+		int[] prop = new int[4];
+		
+		int i = 2;
+		
+		
+		while(i < properties.length && i < 6) {
+			prop[i-2] = Integer.parseInt(properties[i]);
+			i++;
+		}
+		
+		
+		switch(name) {
 		
 			case "CARRE":
 				return shape.new Square(prop[0], prop[1], prop[2], prop[3]);
@@ -43,14 +50,14 @@ public class Shaper {
 			case "CERCLE":
 				return shape.new Circle(prop[0], prop[1], prop[2]);
 				
-			case "OVAL":
+			case "OVALE":
 				return shape.new Oval(prop[0], prop[1], prop[2], prop[3]);
 				
 			case "LIGNE":
 				return shape.new Line(prop[0], prop[1], prop[2], prop[3]);
 				
 			default:
-				return null;
+				return shape.new Square(0,0,0,0);
 				
 			
 		}

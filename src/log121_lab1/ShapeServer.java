@@ -1,6 +1,7 @@
 package log121_lab1;
 
 import java.io.IOException;
+import ca.etsmtl.log.util.*;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.BufferedReader;
@@ -10,6 +11,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.beans.PropertyChangeListener;
 
 import javax.management.RuntimeErrorException;
@@ -29,10 +32,11 @@ public class ShapeServer implements Connection {
 	private DataInputStream in;
 	private PrintWriter out;
 	private SwingWorker worker;
-	private PropertyChangeListener listener;
+	public PropertyChangeListener listener;
 	private Reader cipher;
+	private Shaper shaper;
 	
-
+	private IDLogger logger = IDLogger.getInstance();;
 	
 
 	public ShapeServer() {
@@ -87,9 +91,9 @@ public class ShapeServer implements Connection {
 	 * outputStream of the socket and reads with a bufferedReader from the 
 	 * inputStream.
 	 */
-	public String getResponse() {
+	public String getResponse() throws IOException {
 		try {	
-			out.println("GET");;
+			out.println("GET");
 				
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			
@@ -101,7 +105,7 @@ public class ShapeServer implements Connection {
 			return line;
 			
 		} catch(IOException e) {
-			return "no response from server";
+			throw e;
 			
 		} 
 		
@@ -114,34 +118,75 @@ public class ShapeServer implements Connection {
 	 */
 	@SuppressWarnings("rawtypes")
 	public void startGetLoop() {
+		System.out.println("lel");
 		worker = new SwingWorker() {
 			
 			@Override
 			protected Object doInBackground() throws Exception {
-				String serverShape;
-				String properties;
+				String serverShape = null;
 				
 				while(true) {
 					
 					Thread.sleep(DELAY);
 					
 					
-					serverShape = getResponse();
-
-					ArrayList<String> splitShape = cipher.split(true ,serverShape, "<?/?[A-Za-z]+>", " ");
-
-					if(serverShape.contains("CARRE")) {
-						splitShape.add(0, "CARRE");
-					} else if(serverShape.contains("RECTANGLE")) {
-						splitShape.add(0, "RECTANGLE");
-					} else if(serverShape.contains("CERCLE")) {
-						splitShape.add(0, "CERCLE");
-					} else if(serverShape.contains("OVALE")) {
-						splitShape.add(0, "OVALE");
-					} else if(serverShape.contains("LIGNE")) {
-						splitShape.add(0, "LIGNE");
-					}
 					
+					try {
+						serverShape = getResponse();
+					} catch(IOException e) {
+						cancel(true);
+					}
+					if(serverShape != null) {
+						ArrayList<String> splitShape = cipher.split(true ,serverShape, "<?/?[A-Za-z]+>", " ");
+					
+
+						if(serverShape.contains("CARRE")) {
+							splitShape.add(0, "CARRE");
+						} else if(serverShape.contains("RECTANGLE")) {
+							splitShape.add(0, "RECTANGLE");
+						} else if(serverShape.contains("CERCLE")) {
+							splitShape.add(0, "CERCLE");
+						} else if(serverShape.contains("OVALE")) {
+							splitShape.add(0, "OVALE");
+						} else if(serverShape.contains("LIGNE")) {
+							splitShape.add(0, "LIGNE");
+						}
+						
+						String[] str = new String[splitShape.size()];
+						for(int i = 0; i <splitShape.size(); i++) {
+							str[i] = splitShape.get(i);
+						}
+						
+						Shape shape;
+						if(str.length > 2){
+							shape = shaper.create(str);
+							logger.logID(Integer.parseInt(str[1]));
+						} else{ 
+							shape = shaper.create(new String[]{"CARRE","0","0","0","0"});
+						}
+						
+						
+						
+						
+						
+						if(listener != null &&shape.originX>0){
+							//listener.receive
+							try{
+								firePropertyChange("Shape", new String(str[0]), shape);
+							} catch(Exception e){
+								e.printStackTrace();
+							}
+						
+						}
+					}
+					/*
+					 * Edit du 30-09 au soir
+					 * Je sais maintenant avec certitude que le thread plantait. Il passe à la méthode done() quand il plante.
+					 * J'ai lu que SwingWorker "Mange" les exception. Il fait juste planter lors d'une exception, rien d'autre. 
+					 * Ainsi j'ai trouvé qu'en mettant la methode get() dans le done(), il m'affichait ainsi la stack de l'exception.
+					 * 
+					 * 
+					 */
 					
 					/*
 					 * ça aussi ça plante....
@@ -171,26 +216,31 @@ public class ShapeServer implements Connection {
 					//ArrayList<String> splitProperties = cipher.split(properties, " ");
 					
 					//splitShape.addAll(2, splitProperties);
-					
 
-					if(listener != null){
-						
-						firePropertyChange("Shape", 1, splitShape);
-					}
 
-							
 				}
-				
-
-			
+							
 			}
 			
+			@Override
+			protected void done() {
+				try {
+					get();
+				} catch (InterruptedException | ExecutionException e) {
+					e.printStackTrace();
+					
+					
+				}
+			}
 		};
 		
-		if(listener != null)
-			worker.addPropertyChangeListener(listener);
+		
+		
+		worker.addPropertyChangeListener(listener);
 		
 		worker.execute();
+		
+		
 		
 	}
 	
@@ -203,7 +253,16 @@ public class ShapeServer implements Connection {
 	 * Closes the socket
 	 */
 	public boolean close() {
+		if(worker != null){	
+			try{
+				worker.cancel(true);
+			} catch(CancellationException e) {
+				System.out.println("worker cancelled");
+			}
+		}
+			
 		try{
+			out.println("END");
 			socket.close();
 			in.close();
 			out.close();
@@ -223,15 +282,16 @@ public class ShapeServer implements Connection {
 		
 	}
 	
+	public void setShaper(Shaper shaper) {
+		this.shaper = shaper;
+	}
+	
 	public boolean isSocketOpen() {
 		if(socket != null){
 			return true;
-					
-		}	else{
+		} else {
 			return false;
-					
 		}
-				
 					
 	}
 

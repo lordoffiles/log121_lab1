@@ -1,6 +1,7 @@
 package log121_lab1;
 
 import java.awt.Component;
+import java.awt.Graphics;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -17,34 +18,32 @@ import javax.swing.JOptionPane;
 public class WindowManager extends JFrame {
 	DisplayQueue queue;
 	
+	public static final int WIDTH = 500;
+	public static final int HEIGHT = 500;
+	
 	
 	public WindowManager() {
-		setSize(500, 500);
+		setSize(WIDTH, HEIGHT);
 		setTitle("Client - Shape");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		
+		
 		queue = new DisplayQueue(10);
-		
-		
-		/*
-		 * TODO Do menu bar
-		 */
-		
-		
-		
-		
+		repaint();
 		
 	}
 	
+	
+	
 	/**
 	 * Adds the specified component to the display queue which acts in a first
-	 * in first out fashion
+	 * in, first out fashion
 	 * @param comp the component to add
+	 * @throws CloneNotSupportedException 
 	 */
-	public void addToDisplayQueue(Component comp) {
-		System.out.println(comp);
-		DisplayQueue oldQueue = queue;
+	public void addToDisplayQueue(Component comp) throws CloneNotSupportedException {
+		DisplayQueue oldQueue = (DisplayQueue)queue.clone();
 		queue.addToQueue(comp);
 		
 		validateDisplay(oldQueue);
@@ -58,15 +57,26 @@ public class WindowManager extends JFrame {
 	 */
 	private void validateDisplay(DisplayQueue oldQueue) {
 		int i = 0;
+		Component queueElement;
 		while(i < queue.size()) {
-			if( !(oldQueue.get(i)).equals( (queue.get(i)) ) ) {
+			queueElement = queue.get(i);
+			if( oldQueue.get(i) != null && !(oldQueue.get(i)).equals( (queueElement) ) ) {
 				remove(i);
-				add(queue.get(i));
 				
+				add(queue.get(i));
+				validate();
+				return;
+				
+			} else if(oldQueue.get(i) == null) {
+				add(queue.get(i));
+				validate();
+				return;
 			}
-			
+			i++;
 		}
 		
+		
+
 	}
 	
 	/**

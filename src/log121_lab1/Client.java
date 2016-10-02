@@ -5,16 +5,24 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.invoke.CallSite;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-import ca.etsmtl.log.util.*;
+import log121_lab1.Shape.Circle;
+import log121_lab1.Shape.Line;
+import log121_lab1.Shape.Rectangle;
+import log121_lab1.Shape.Square;
+import log121_lab1.Shape.Oval;
+
+
 
 /**
  * Main class
@@ -24,11 +32,11 @@ import ca.etsmtl.log.util.*;
  */
 public class Client implements PropertyChangeListener, ActionListener{
 	
-	WindowManager window;
-	Cipher cipher;
-	ShapeServer server;
-	Shaper shaper;
-	IDLogger logger = IDLogger.getInstance();
+	private WindowManager window;
+	private Cipher cipher;
+	private ShapeServer server;
+	private Shaper shaper;
+	private int i = 0;
 	
 	public Client() {
 		
@@ -44,6 +52,7 @@ public class Client implements PropertyChangeListener, ActionListener{
 		
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem miClose = new JMenuItem("Close");
+		
 		miClose.setActionCommand("closeWindow");
 		
 		fileMenu.add(miClose);
@@ -60,10 +69,16 @@ public class Client implements PropertyChangeListener, ActionListener{
 		JMenuItem miCloseConnection = new JMenuItem("Close Connection");
 		miCloseConnection.setActionCommand("closeConnection");
 		
+		JMenuItem miStartLoop = new JMenuItem("Start requests");
+		miStartLoop.setActionCommand("startLoop");
+		
 		serverMenu.add(miStatusConnection);
 		serverMenu.addSeparator();
 		serverMenu.add(miOpenConnection);
 		serverMenu.add(miCloseConnection);
+		serverMenu.addSeparator();
+		serverMenu.add(miStartLoop);
+		
 		
 		menu.add(fileMenu);
 		menu.add(serverMenu);
@@ -77,8 +92,9 @@ public class Client implements PropertyChangeListener, ActionListener{
 		miCloseConnection.addActionListener(this);
 		miOpenConnection.addActionListener(this);
 		miStatusConnection.addActionListener(this);
+		miStartLoop.addActionListener(this);
 		
-		
+		//////////////////////////////////
 		
 		cipher = new Cipher();
 		
@@ -87,12 +103,10 @@ public class Client implements PropertyChangeListener, ActionListener{
 		
 		connect("");
 		
-		server.setCipher(cipher);
 		
-		server.setProprietyChangeListener(this);
 		
 		if(server != null) {
-			server.startGetLoop();
+			//server.startGetLoop();
 			
 		}
 	
@@ -128,15 +142,18 @@ public class Client implements PropertyChangeListener, ActionListener{
 		
 		if(connectionInfo != null){
 			ArrayList<String> arrayInfo = cipher.split(connectionInfo, "[:]");
-		
-			try {
-				ip = InetAddress.getByName(arrayInfo.get(0));
-				port = Integer.parseInt(arrayInfo.get(1));
-				
-			} 
-			catch (UnknownHostException e) {	
-				connect(e.toString());
-				
+			if(arrayInfo.size()>1){
+				try {
+					ip = InetAddress.getByName(arrayInfo.get(0));
+					port = Integer.parseInt(arrayInfo.get(1));
+					
+				} 
+				catch (UnknownHostException e) {	
+					connect(e.toString());
+					
+				}
+			} else {
+				connect("Bad host");
 			}
 			
 		} else {
@@ -149,8 +166,17 @@ public class Client implements PropertyChangeListener, ActionListener{
 			
 			
 			boolean serverRunning = server.open(ip, port);
-			if(serverRunning)
+			if(serverRunning) {
 				window.alert("Succes", server.status());
+				server.setCipher(cipher);
+				
+				server.setProprietyChangeListener(this);
+				
+				server.setShaper(shaper);
+			}
+			else{
+				connect("Server unreachable");
+			}
 			
 		} else {
 			
@@ -167,7 +193,7 @@ public class Client implements PropertyChangeListener, ActionListener{
 			@Override
 			public void run() {
 				Client app = new Client();
-
+				
 			}
 			
 		});
@@ -177,17 +203,50 @@ public class Client implements PropertyChangeListener, ActionListener{
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		
-		if((evt.getOldValue()).equals(1) )	{
-			/*
-			 * I know it will be an arraylist... it can't be otherwise
-			 */
-			ArrayList<String> sl = (ArrayList<String>) evt.getNewValue();
-			if(sl.size()>1){
-				System.out.println(sl);
-				logger.logID(Integer.parseInt(sl.get(1)));
-//			
-//				window.addToDisplayQueue(shaper.create(sl));
+		
+		i++;
+		
+		System.out.print("lel");
+		
+		if(i>1)	{
+			
+			String name;
+			try{
+				name = (String)evt.getOldValue();
+			} catch(ClassCastException e) {
+				return;
 			}
+			Shape sheep;
+			switch(name){
+			case "CARRE":
+				sheep = (Square) evt.getNewValue();
+				break;
+			case "RECTANGLE":
+				sheep = (Rectangle) evt.getNewValue();
+				break;
+			case "CERCLE":
+				sheep = (Circle) evt.getNewValue();
+				break;
+			case "OVALE":
+				sheep = (Oval) evt.getNewValue();
+				break;
+			case "LIGNE":
+				sheep = (Line) evt.getNewValue();
+				break;
+			default:
+				return;
+			}
+			
+
+			try {
+				window.addToDisplayQueue(sheep);
+			} catch (CloneNotSupportedException e) {
+				
+				throw new RuntimeException();
+			}
+			
+				
+		
 		}
 		
 		
@@ -212,16 +271,22 @@ public class Client implements PropertyChangeListener, ActionListener{
 				 * a new socket
 				 */
 				
-				if(!server.isSocketOpen()) {
-					connect("");
+				if(server.isSocketOpen()){
+					window.alert("Server Status", server.status());
 				} else {
-					server.close();
 					connect("");
 				}
 				break;
 			case "closeConnection":
-				server.close();
-				window.alert("Info", "Disconnected from server");
+				if(server.isSocketOpen()){
+					server.close();
+					window.alert("Info", "Disconnected from server");
+				}
+				break;
+			case "startLoop":
+				if(server.isSocketOpen()){
+					server.startGetLoop();
+				}
 				break;
 		}
 	}
