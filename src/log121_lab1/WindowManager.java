@@ -2,6 +2,7 @@ package log121_lab1;
 
 import java.awt.Component;
 import java.awt.Graphics;
+import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -25,7 +26,7 @@ public class WindowManager extends JFrame {
 	public WindowManager() {
 		setSize(WIDTH, HEIGHT);
 		setTitle("Client - Shape");
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setLocationRelativeTo(null);
 		
 		
@@ -44,7 +45,10 @@ public class WindowManager extends JFrame {
 	 */
 	public void addToDisplayQueue(Component comp) throws CloneNotSupportedException {
 		DisplayQueue oldQueue = (DisplayQueue)queue.clone();
+		
+		
 		queue.addToQueue(comp);
+
 		
 		validateDisplay(oldQueue);
 		
@@ -58,10 +62,11 @@ public class WindowManager extends JFrame {
 	private void validateDisplay(DisplayQueue oldQueue) {
 		int i = 0;
 		Component queueElement;
+
 		while(i < queue.size()) {
 			queueElement = queue.get(i);
 			if( oldQueue.get(i) != null && !(oldQueue.get(i)).equals( (queueElement) ) ) {
-				remove(i);
+				remove(queue.get(0));
 				
 				add(queue.get(i));
 				validate();

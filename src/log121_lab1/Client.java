@@ -3,6 +3,8 @@ package log121_lab1;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.invoke.CallSite;
@@ -30,7 +32,7 @@ import log121_lab1.Shape.Oval;
  * @date 29/09/2015
  *
  */
-public class Client implements PropertyChangeListener, ActionListener{
+public class Client implements PropertyChangeListener, ActionListener, WindowListener{
 	
 	private WindowManager window;
 	private Cipher cipher;
@@ -42,6 +44,8 @@ public class Client implements PropertyChangeListener, ActionListener{
 		
 		window = new WindowManager();
 		window.setVisible(true);
+		
+		window.addWindowListener(this);
 		
 		/*
 		 * Creates the top menu and its elements, then adds it to the window 
@@ -101,12 +105,14 @@ public class Client implements PropertyChangeListener, ActionListener{
 		shaper = new Shaper();
 		
 		
+		
+		
 		connect("");
 		
 		
 		
 		if(server != null) {
-			//server.startGetLoop();
+			server.startGetLoop();
 			
 		}
 	
@@ -202,11 +208,16 @@ public class Client implements PropertyChangeListener, ActionListener{
 	
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		
+		System.out.println("xx");
 		
 		i++;
+		if(evt.getPropertyName().equals("Alert")&&i>1) {
+			server.close();
+			window.alert("Error", "Connection lost");
+			
+			return;
+		}
 		
-		System.out.print("lel");
 		
 		if(i>1)	{
 			
@@ -260,6 +271,8 @@ public class Client implements PropertyChangeListener, ActionListener{
 
 		switch(e.getActionCommand()){
 			case "closeWindow":
+				server.close();
+				System.exit(0);
 				
 				break;
 			case "statusConnection":
@@ -290,9 +303,32 @@ public class Client implements PropertyChangeListener, ActionListener{
 				break;
 		}
 	}
-	
-	
 
+	@Override
+	public void windowClosed(WindowEvent e) {
+		server.close();
+		System.exit(0);
+		
+	}
 
-	
+	@Override
+	public void windowOpened(WindowEvent e) {}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		server.close();
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {}
+
+	@Override
+	public void windowActivated(WindowEvent e) {}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {}
+
 }

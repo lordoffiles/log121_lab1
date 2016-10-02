@@ -124,6 +124,8 @@ public class ShapeServer implements Connection {
 			@Override
 			protected Object doInBackground() throws Exception {
 				String serverShape = null;
+				//Empty response counter
+				int emptyCounter = 0;
 				
 				while(true) {
 					
@@ -131,12 +133,10 @@ public class ShapeServer implements Connection {
 					
 					
 					
-					try {
-						serverShape = getResponse();
-					} catch(IOException e) {
-						cancel(true);
-					}
-					if(serverShape != null) {
+					
+					serverShape = getResponse();
+					
+					if(!serverShape.equals("")) {
 						ArrayList<String> splitShape = cipher.split(true ,serverShape, "<?/?[A-Za-z]+>", " ");
 					
 
@@ -171,12 +171,16 @@ public class ShapeServer implements Connection {
 						
 						if(listener != null &&shape.originX>0){
 							//listener.receive
-							try{
-								firePropertyChange("Shape", new String(str[0]), shape);
-							} catch(Exception e){
-								e.printStackTrace();
-							}
+							
+							firePropertyChange("Shape", new String(str[0]), shape);
+							
 						
+						}
+					} else {
+						emptyCounter++;
+						
+						if(emptyCounter>5) {
+							firePropertyChange("Alert", null, null);
 						}
 					}
 					/*
@@ -219,6 +223,7 @@ public class ShapeServer implements Connection {
 
 
 				}
+				
 							
 			}
 			
@@ -261,17 +266,11 @@ public class ShapeServer implements Connection {
 			}
 		}
 			
-		try{
-			out.println("END");
-			socket.close();
-			in.close();
-			out.close();
-			socket = null;
-			
-		} catch(IOException e){
-			return false;
-			
-		}
+		
+		out.println("END");
+
+		socket = null;
+
 		
 		return true;
 	}
