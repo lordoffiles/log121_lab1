@@ -1,3 +1,14 @@
+/*
+ * Cours: LOG121
+ * Session: A2016
+ * Groupe: 02
+ * Projet: Laboratoire 1
+ * Étudiant(e)(s): Vincent Roy
+ * Professeur: Vincent Lacasse
+ * Num du fichier: ShapeServer.java
+ * Date création: 18-09
+ * Date dern. modif.: 02-10
+ */
 package log121_lab1;
 
 import java.io.IOException;
@@ -6,20 +17,17 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.beans.PropertyChangeListener;
-
-import javax.management.RuntimeErrorException;
 import javax.swing.SwingWorker;
 
 /**
- * Connection to the server
+ * Connection to the server with java.net.socket and worker thread with 
+ * javax.swing.Swingworker 
  * @author Vincent
  * @date 29/09/2015
  *
@@ -32,7 +40,7 @@ public class ShapeServer implements Connection {
 	private DataInputStream in;
 	private PrintWriter out;
 	private SwingWorker worker;
-	public PropertyChangeListener listener;
+	private PropertyChangeListener listener;
 	private Reader cipher;
 	private Shaper shaper;
 	
@@ -40,6 +48,7 @@ public class ShapeServer implements Connection {
 	
 
 	public ShapeServer() {
+		shaper = new Shaper();
 		
 	}
 	
@@ -90,8 +99,11 @@ public class ShapeServer implements Connection {
 	 * sends GET command to server through a PrintWriter connected to the
 	 * outputStream of the socket and reads with a bufferedReader from the 
 	 * inputStream.
+	 * 
+	 * @throws IOException if the connection can't send command or receive 
+	 * response to and from the server
 	 */
-	public String getResponse() throws IOException {
+	public String getResponse() {
 		try {	
 			out.println("GET");
 				
@@ -105,7 +117,7 @@ public class ShapeServer implements Connection {
 			return line;
 			
 		} catch(IOException e) {
-			throw e;
+			throw new RuntimeException();
 			
 		} 
 		
@@ -114,7 +126,7 @@ public class ShapeServer implements Connection {
 	/**
 	 * SwingWorker to get responses from the server asynchronously from the EDT.
 	 * 
-	 * NOT WORKING ONLY WORKING ONCE
+	 * 
 	 */
 	@SuppressWarnings("rawtypes")
 	public void startGetLoop() {
@@ -131,147 +143,121 @@ public class ShapeServer implements Connection {
 					
 					Thread.sleep(DELAY);
 					
-					
-					
-					
 					serverShape = getResponse();
 					
 					if(!serverShape.equals("")) {
 						ArrayList<String> splitShape = cipher.split(true ,serverShape, "<?/?[A-Za-z]+>", " ");
-					
-
+						
 						if(serverShape.contains("CARRE")) {
 							splitShape.add(0, "CARRE");
+							
 						} else if(serverShape.contains("RECTANGLE")) {
 							splitShape.add(0, "RECTANGLE");
+							
 						} else if(serverShape.contains("CERCLE")) {
 							splitShape.add(0, "CERCLE");
+							
 						} else if(serverShape.contains("OVALE")) {
 							splitShape.add(0, "OVALE");
+							
 						} else if(serverShape.contains("LIGNE")) {
 							splitShape.add(0, "LIGNE");
+							
 						}
 						
 						String[] str = new String[splitShape.size()];
+						
 						for(int i = 0; i <splitShape.size(); i++) {
 							str[i] = splitShape.get(i);
+							
 						}
 						
 						Shape shape;
 						if(str.length > 2){
 							shape = shaper.create(str);
 							logger.logID(Integer.parseInt(str[1]));
+							
 						} else{ 
 							shape = shaper.create(new String[]{"CARRE","0","0","0","0"});
+							
 						}
-						
-						
-						
-						
 						
 						if(listener != null &&shape.originX>0){
-							//listener.receive
-							
 							firePropertyChange("Shape", new String(str[0]), shape);
 							
-						
 						}
+						
 					} else {
 						emptyCounter++;
 						
 						if(emptyCounter>5) {
 							firePropertyChange("Alert", null, null);
+							
 						}
+						
 					}
 					/*
 					 * Edit du 30-09 au soir
-					 * Je sais maintenant avec certitude que le thread plantait. Il passe à la méthode done() quand il plante.
-					 * J'ai lu que SwingWorker "Mange" les exception. Il fait juste planter lors d'une exception, rien d'autre. 
-					 * Ainsi j'ai trouvé qu'en mettant la methode get() dans le done(), il m'affichait ainsi la stack de l'exception.
+					 * Je sais maintenant avec certitude que le thread plantait
+					 * . Il passe à la méthode done() quand il plante.
+					 * J'ai lu que SwingWorker "Mange" les exception. Il fait 
+					 * juste planter lors d'une exception, rien d'autre. 
+					 * Ainsi j'ai trouvé qu'en mettant la methode get() dans le 
+					 * done(), il m'affichait ainsi la stack de l'exception.
 					 * 
 					 * 
 					 */
 					
-					/*
-					 * ça aussi ça plante....
-					 */
-//					int i = 0;
-//					while(i < splitShape.size()) {
-//						if(splitShape.get(i).equals(" ")) {
-//							splitShape.remove(i);
-//						}
-//					}
-					
-					
-					/*
-					 * je pense que ma méthode findTag fait planter le worker...
-					 * 
-					 * les différentes oppérations sur la liste plantent aussi....
-					 */
-					
-					//String tag = cipher.findTag(serverShape);
-					
-					//splitShape.add(0,"XD");
-					
-					//splitShape.add(0, cipher.findTag(serverShape));
-					
-//					properties = splitShape.get(2);
-//					System.out.println("!!"+properties);
-					//ArrayList<String> splitProperties = cipher.split(properties, " ");
-					
-					//splitShape.addAll(2, splitProperties);
-
-
 				}
-				
-							
+								
 			}
 			
 			@Override
 			protected void done() {
 				try {
 					get();
+					
 				} catch (InterruptedException | ExecutionException e) {
 					e.printStackTrace();
 					
-					
 				}
+				
 			}
+			
 		};
 		
-		
-		
 		worker.addPropertyChangeListener(listener);
-		
 		worker.execute();
 		
-		
-		
 	}
-	
-
+	/**
+	 * Sets the listener for sending information to the EDT in the worker 
+	 * @param listener element on which the PropertyChangeListener is set
+	 */
 	public void setProprietyChangeListener(PropertyChangeListener listener) {
 		this.listener = listener;
+		
 	}
 	
 	/**
-	 * Closes the socket
+	 * Closes the socket by sending the END command to the server. Also stops
+	 * the SwingWorker.
 	 */
 	public boolean close() {
 		if(worker != null){	
 			try{
 				worker.cancel(true);
+				
 			} catch(CancellationException e) {
 				System.out.println("worker cancelled");
+				
 			}
+			
 		}
 			
-		
 		out.println("END");
-
 		socket = null;
 
-		
 		return true;
 	}
 	
@@ -281,9 +267,9 @@ public class ShapeServer implements Connection {
 		
 	}
 	
-	public void setShaper(Shaper shaper) {
-		this.shaper = shaper;
-	}
+//	public void setShaper(Shaper shaper) {
+//		this.shaper = shaper;
+//	}
 	
 	public boolean isSocketOpen() {
 		if(socket != null){

@@ -1,3 +1,14 @@
+/*
+ * Cours: LOG121
+ * Session: A2016
+ * Groupe: 02
+ * Projet: Laboratoire 1
+ * Étudiant(e)(s): Vincent Roy
+ * Professeur: Vincent Lacasse
+ * Num du fichier: Cipher.java
+ * Date création: 18-09
+ * Date dern. modif.: 29-10
+ */
 package log121_lab1;
 
 import java.util.ArrayList;
@@ -10,6 +21,12 @@ import java.util.ArrayList;
  */
 public class Cipher implements Reader {
 
+	/**
+	 * Splits an input string on the specified character
+	 * @param input the string to split
+	 * @param splitPoint the character to split the string on
+	 * @return ArrayList containing the string segments
+	 */
 	public ArrayList<String> split(String input, String splitPoint){
 		
 		ArrayList<String> splitList = new ArrayList<String>(); 
@@ -25,6 +42,11 @@ public class Cipher implements Reader {
 		return splitList;
 	}
 	
+	/**
+	 * Find the first tag in a string
+	 * @param input the string to search
+	 * @return the first text in the first tag found
+	 */
 	public String findTag(String input) {
 		String str = input;
 		int i = 0;

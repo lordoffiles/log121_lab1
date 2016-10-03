@@ -1,6 +1,15 @@
+/*
+ * Cours: LOG121
+ * Session: A2016
+ * Groupe: 02
+ * Projet: Laboratoire 1
+ * Étudiant(e)(s): Vincent Roy
+ * Professeur: Vincent Lacasse
+ * Num du fichier: Shaper.java
+ * Date création: 18-09
+ * Date dern. modif.: 02-10
+ */
 package log121_lab1;
-
-import java.util.ArrayList;
 
 /**
  * Creates shape objects
@@ -9,7 +18,7 @@ import java.util.ArrayList;
  *
  */
 public class Shaper {
-	Shape shape;
+	private Shape shape;
 	
 	public Shaper() {
 		shape = new Shape();

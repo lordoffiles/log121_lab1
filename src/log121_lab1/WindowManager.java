@@ -1,23 +1,34 @@
+/*
+ * Cours: LOG121
+ * Session: A2016
+ * Groupe: 02
+ * Projet: Laboratoire 1
+ * Étudiant(e)(s): Vincent Roy
+ * Professeur: Vincent Lacasse
+ * Num du fichier: WindowManager.java
+ * Date création: 18-09
+ * Date dern. modif.: 02-10
+ */
 package log121_lab1;
 
 import java.awt.Component;
-import java.awt.Graphics;
-import java.util.Random;
 
 import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 /**
- * Frame containing the shapes
+ * Main application window and manages components with javax.swing.JFrame
  * @author Vincent
  * @date 29/09/2015
  *
  */
 public class WindowManager extends JFrame {
-	DisplayQueue queue;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private DisplayQueue queue;
 	
 	public static final int WIDTH = 500;
 	public static final int HEIGHT = 500;
@@ -55,7 +66,8 @@ public class WindowManager extends JFrame {
 	}
 	
 	/**
-	 * Verifies which component is the newest in the queue and adds it to 
+	 * Verifies which component is the newest in the queue by comparing to the 
+	 * previous queue of elements and adds it to 
 	 * the frame
 	 * @param oldQueue the queue before adding the element
 	 */

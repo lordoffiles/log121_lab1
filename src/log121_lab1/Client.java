@@ -1,3 +1,15 @@
+/*
+ * Cours: LOG121
+ * Session: A2016
+ * Groupe: 02
+ * Projet: Laboratoire 1
+ * Étudiant(e)(s): Vincent Roy
+ * Professeur: Vincent Lacasse
+ * Num du fichier: Client.java
+ * Date création: 18-09
+ * Date dern. modif.: 02-10
+ */
+
 package log121_lab1;
 
 import java.awt.EventQueue;
@@ -7,12 +19,9 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.invoke.CallSite;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.logging.Logger;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -37,14 +46,12 @@ public class Client implements PropertyChangeListener, ActionListener, WindowLis
 	private WindowManager window;
 	private Cipher cipher;
 	private ShapeServer server;
-	private Shaper shaper;
 	private int i = 0;
 	
 	public Client() {
 		
 		window = new WindowManager();
-		window.setVisible(true);
-		
+		window.setVisible(true);	
 		window.addWindowListener(this);
 		
 		/*
@@ -102,23 +109,12 @@ public class Client implements PropertyChangeListener, ActionListener, WindowLis
 		
 		cipher = new Cipher();
 		
-		shaper = new Shaper();
-		
-		
-		
-		
 		connect("");
-		
-		
 		
 		if(server != null) {
 			server.startGetLoop();
 			
 		}
-	
-		//propertyChange(new PropertyChangeEvent(this, "shape", 1, new ArrayList<String>({"CARRE","100","100","300","300"}) );
-		
-		
 		
 	}
 	
@@ -141,7 +137,6 @@ public class Client implements PropertyChangeListener, ActionListener, WindowLis
 		} else {
 			connectionInfo = window.prompt(message); 
 		}
-		
 		
 		InetAddress ip = null;
 		int port = 0;
@@ -170,7 +165,6 @@ public class Client implements PropertyChangeListener, ActionListener, WindowLis
 		
 		if(ip != null){
 			
-			
 			boolean serverRunning = server.open(ip, port);
 			if(serverRunning) {
 				window.alert("Succes", server.status());
@@ -178,16 +172,17 @@ public class Client implements PropertyChangeListener, ActionListener, WindowLis
 				
 				server.setProprietyChangeListener(this);
 				
-				server.setShaper(shaper);
 			}
 			else{
 				connect("Server unreachable");
+				
 			}
 			
 		} else {
-			
 			connect(server.status());
+			
 		}
+		
 		return true;
 		
 		
@@ -198,6 +193,7 @@ public class Client implements PropertyChangeListener, ActionListener, WindowLis
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				@SuppressWarnings("unused")
 				Client app = new Client();
 				
 			}
@@ -208,61 +204,61 @@ public class Client implements PropertyChangeListener, ActionListener, WindowLis
 	
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		System.out.println("xx");
-		
 		i++;
 		if(evt.getPropertyName().equals("Alert")&&i>1) {
 			server.close();
 			window.alert("Error", "Connection lost");
 			
 			return;
+			
 		}
 		
-		
 		if(i>1)	{
-			
 			String name;
 			try{
 				name = (String)evt.getOldValue();
+				
 			} catch(ClassCastException e) {
 				return;
+				
 			}
 			Shape sheep;
 			switch(name){
+			
 			case "CARRE":
 				sheep = (Square) evt.getNewValue();
 				break;
+				
 			case "RECTANGLE":
 				sheep = (Rectangle) evt.getNewValue();
 				break;
+				
 			case "CERCLE":
 				sheep = (Circle) evt.getNewValue();
 				break;
+				
 			case "OVALE":
 				sheep = (Oval) evt.getNewValue();
 				break;
+				
 			case "LIGNE":
 				sheep = (Line) evt.getNewValue();
 				break;
+				
 			default:
 				return;
+				
 			}
-			
 
 			try {
 				window.addToDisplayQueue(sheep);
+				
 			} catch (CloneNotSupportedException e) {
-				
 				throw new RuntimeException();
-			}
-			
 				
+			}
 		
 		}
-		
-		
-		
-		
 		
 	}
 
@@ -273,39 +269,51 @@ public class Client implements PropertyChangeListener, ActionListener, WindowLis
 			case "closeWindow":
 				server.close();
 				System.exit(0);
-				
 				break;
+				
 			case "statusConnection":
 				window.alert("Server Status", server.status());
 				break;
+				
 			case "openConnection":
 				/*
 				 * checks if the server is already open before opening 
 				 * a new socket
 				 */
-				
 				if(server.isSocketOpen()){
 					window.alert("Server Status", server.status());
+					
 				} else {
 					connect("");
+					
 				}
 				break;
+				
 			case "closeConnection":
 				if(server.isSocketOpen()){
 					server.close();
 					window.alert("Info", "Disconnected from server");
+					
 				}
+				
 				break;
+				
 			case "startLoop":
 				if(server.isSocketOpen()){
 					server.startGetLoop();
+					
 				}
+				
 				break;
+				
 		}
 	}
 
 	@Override
 	public void windowClosed(WindowEvent e) {
+		/*
+		 * Closes properly the connection before exiting the program
+		 */
 		server.close();
 		System.exit(0);
 		
@@ -316,6 +324,7 @@ public class Client implements PropertyChangeListener, ActionListener, WindowLis
 
 	@Override
 	public void windowClosing(WindowEvent e) {
+		//...redundancy...
 		server.close();
 	}
 
