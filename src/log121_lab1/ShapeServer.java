@@ -39,6 +39,7 @@ public class ShapeServer implements Connection {
 	private Socket socket;
 	private DataInputStream in;
 	private PrintWriter out;
+	@SuppressWarnings("rawtypes")
 	private SwingWorker worker;
 	private PropertyChangeListener listener;
 	private Reader cipher;

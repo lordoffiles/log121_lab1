@@ -15,8 +15,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 
-import org.junit.Before;
-
 /**
  * Shapes - Square, Rectangle, Circle, Oval, Line
  * @author Vincent Roy
@@ -25,6 +23,10 @@ import org.junit.Before;
  */
 public class Shape extends Component{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	protected static int CYAN = 0x00FFFF;
 	protected static int MAGENTA = 0xFF00FF;
 	protected static int RED = 0xFF0000;
@@ -52,6 +54,12 @@ public class Shape extends Component{
 	
 
 	public class Square extends Shape{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+
 		public Square(int originX, int originY, int x2, int y2) {
 			super();
 			this.originX = originX;
@@ -73,6 +81,11 @@ public class Shape extends Component{
 	}
 
 	class Rectangle extends Shape{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		public Rectangle(int originX, int originY, int x2, int y2) {
 			super();
 			this.originX = originX; 
@@ -92,6 +105,11 @@ public class Shape extends Component{
 	}
 
 	class Circle extends Shape{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		public Circle(int originX, int originY, int radiusX) {
 			super();
 			this.originX = originX; 
@@ -111,6 +129,11 @@ public class Shape extends Component{
 	}
 
 	class Oval extends Shape{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		public Oval(int originX, int originY, int radiusX, int radiusY) {
 			super();
 			this.originX = originX; 
@@ -130,6 +153,11 @@ public class Shape extends Component{
 	}
 
 	class Line extends Shape{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		public Line(int originX, int originY, int x2, int y2) {
 			super();
 			this.originX = originX; 
